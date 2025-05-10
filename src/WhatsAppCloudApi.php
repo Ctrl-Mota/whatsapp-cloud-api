@@ -6,6 +6,7 @@ use Netflie\WhatsAppCloudApi\Message\ButtonReply\ButtonAction;
 use Netflie\WhatsAppCloudApi\Message\Contact\ContactName;
 use Netflie\WhatsAppCloudApi\Message\Contact\Phone;
 use Netflie\WhatsAppCloudApi\Message\CtaUrl\Header;
+use Netflie\WhatsAppCloudApi\Message\Flow\Action as FlowAction;
 use Netflie\WhatsAppCloudApi\Message\Media\MediaID;
 use Netflie\WhatsAppCloudApi\Message\MultiProduct\Action as MultiProductAction;
 use Netflie\WhatsAppCloudApi\Message\OptionsList\Action;
@@ -354,6 +355,46 @@ class WhatsAppCloudApi
         return $this->client->sendMessage($request);
     }
 
+
+    /**
+     * Sends a CTA flow
+     *
+     * @param  string      $to        WhatsApp ID or phone number for the person you want to send a message to.
+     * @param  FlowAction  $action    Objeto de ação do flow com todas as configurações
+     * @param  ?Header     $header    The header.
+     * @param  ?string     $body      The body.
+     * @param  ?string     $footer    The footer.
+     *
+     * @return Response
+     *
+     * @throws Response\ResponseException
+     */
+    public function sendFlow(
+        string $to, 
+        FlowAction $action,
+        ?Header $header = null, 
+        ?string $body = null, 
+        ?string $footer = null
+    ): Response
+    {
+        $message = new Message\FlowMessage(
+            $to, 
+            $action,
+            $header, 
+            $body, 
+            $footer, 
+            $this->reply_to
+        );
+        $request = new Request\MessageRequest\RequestFlowMessage(
+            $message,
+            $this->app->accessToken(),
+            $this->app->fromPhoneNumberId(),
+            $this->timeout
+        );
+
+        return $this->client->sendMessage($request);
+    }
+
     public function sendButton(string $to, string $body, ButtonAction $action, ?string $header = null, ?string $footer = null): Response
     {
         $message = new Message\ButtonReplyMessage(
@@ -608,5 +649,27 @@ class WhatsAppCloudApi
         $this->reply_to = $message_id;
 
         return $this;
+    }
+
+    /**
+     * Sends a typing indicator to the recipient.
+     *
+     * @param string $message_id The ID of the message to reply to (optional)
+     * @param string $type The type of typing indicator (default: "text")
+     *
+     * @return Response
+     *
+     * @throws Response\ResponseException
+     */
+    public function sendTypingIndicator(string $message_id, string $type = 'text'): Response
+    {
+        $request = new Request\TypingIndicatorRequest(
+            $message_id,
+            $this->app->accessToken(),
+            $this->app->fromPhoneNumberId(),
+            $this->timeout
+        );
+
+        return $this->client->sendMessage($request);
     }
 }

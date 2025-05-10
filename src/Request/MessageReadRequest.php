@@ -5,12 +5,12 @@ namespace Netflie\WhatsAppCloudApi\Request;
 use Netflie\WhatsAppCloudApi\Message\Message;
 use Netflie\WhatsAppCloudApi\Request;
 
-final class MessageReadRequest extends Request implements RequestWithBody
+class MessageReadRequest extends Request implements RequestWithBody
 {
     /**
      * @var string WhatsApp Message Id will be marked as read.
      */
-    private string $message_id;
+    protected string $message_id;
 
     /**
      * @var string WhatsApp Number Id from messages will sent.
